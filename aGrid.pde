@@ -52,7 +52,9 @@ public class Grid {
         for(int j = 0; j < columns; j++){ 
           grid[i][j].gCost = 0;
           grid[i][j].hCost = 0;
-          grid[i][j].id = 0;
+          if(grid[i][j].id != -1){
+            grid[i][j].id = 0;
+          }
         }
    }
    

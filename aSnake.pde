@@ -9,6 +9,8 @@ public class SnakeAI extends Grid {
   List<Node> body;
   private int x,y;  //x and y represent the head of the snake
   boolean panic = false;
+  List<Node> poison;
+  boolean showpoison;
   public SnakeAI(){
    super();
    food = new Node();
@@ -16,9 +18,15 @@ public class SnakeAI extends Grid {
    
    //Begins body at the node
    body = new ArrayList<Node>();
+   poison = new ArrayList<Node>();
+   showpoison = false;
    body.add(new Node(0, 0, false));
    initPath(new PVector(this.x, this.y), new PVector(food.x, food.y));
     navigate();
+  }
+  
+  void poisonOn(){
+    showpoison = true;
   }
   
   void displaySnake(){
@@ -34,6 +42,11 @@ public class SnakeAI extends Grid {
     }
     fill(20, 220, 20); 
     ellipse(food.x*20+10,food.y*20+10, 20, 20);
+    fill(255, 0, 0);
+    for(int i = 0; i < this.poison.size(); i++){
+       //ellipse(poison.get(i).x*20+10, poison.get(i).y*20+10, 20, 20);
+       rect(poison.get(i).x*20, poison.get(i).y*20, 20, 20);
+    }
   }
   
   //If no path is currently available, move everyway you can until a path becomes available
@@ -53,10 +66,15 @@ public class SnakeAI extends Grid {
        path.add(grid[x][y+1]); 
     }
     else{
-      System.out.println("No path is available");
+      //System.out.println("No path is available");
     }
     
   }
+  
+  /**
+  Updates the snake, follows the path
+  If path is mepty it will stall
+  */
   void update(){
     while(path.size() == 0){
        //System.out.println("No path was found");
@@ -91,8 +109,22 @@ public class SnakeAI extends Grid {
     
     
   }
-  
+  /**
+  When the food has been eaten, find a new position that does not exist on the snake of poison positions
+  */
   void foodEaten(){
+    if(this.showpoison){
+      Node newpoison = new Node();
+      newpoison.random();
+      newpoison.walkable = false;
+      newpoison.id = -1;
+      while(grid[newpoison.x][newpoison.y].walkable == false){
+        newpoison.random();
+      }
+      grid[newpoison.x][newpoison.y].walkable = false;
+      grid[newpoison.x][newpoison.y].id = -1;  
+      this.poison.add(newpoison);
+    }
     food.random();
     while(grid[food.x][food.y].walkable == false){
       food.random();
@@ -103,6 +135,8 @@ public class SnakeAI extends Grid {
     navigate();
   }
   
+  
+  /*
   List<Node> cloneSnake(){
     List<Node> clone = new ArrayList<Node>();
     for(int i = 0; i < this.body.size(); i++){
@@ -111,13 +145,13 @@ public class SnakeAI extends Grid {
     return clone;
     
   }
-  
+  */
   //If the snake is of certain size, switch to this algorithm
   void navigate(){
     double a = body.size() *100;
     double x = a/((double)(columns*rows));
-    //System.out.println("body size: " + body.size() + "..." + x + "% of total size");
-    if(body.size() < (columns *rows)*.2){//change to 0.7
+    System.out.println("body size: " + body.size() + "..." + x + "% of total size");
+    if(body.size() < (columns *rows)*.0){//change to 0.7
       Astar();
       return;
     }
@@ -149,10 +183,14 @@ public class SnakeAI extends Grid {
      List neighbors = getNeighbors(currentNode);
      for(int i = 0; i < neighbors.size(); i++){
         Node neighbor = (Node)neighbors.get(i);
-        if(!neighbor.isWalkable() ){
+         
+        if(neighbor.id == -1){//If poison
+          continue;
+        }
+        if(!neighbor.isWalkable()){
            int distanceFromTail = this.body.size() - neighbor.id;
            if(currentNode.gCost > distanceFromTail){
-               //System.out.println("Inspecting unlikey neighbor");
+               //If this is true, then the snake's tail as already moved out of this position
            }else{
                continue;  
            }

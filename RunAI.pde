@@ -9,12 +9,14 @@ public void settings() {
 
  void setup(){
    System.out.println("Running SnakeAI");
-   frameRate(120);
+   frameRate(60);
    sammy = new SnakeAI();
+   //sammy.poisonOn(); //Uncomment this line to see the game with posion tiles
 }
 
 void draw(){
   //System.out.println("Running");
+  
   sammy.update();
   sammy.displaySnake(); 
 }
