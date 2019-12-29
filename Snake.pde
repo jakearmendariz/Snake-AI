@@ -1,8 +1,13 @@
 import java.util.Random; 
 /**
-Node consists of every body of the snake
+The entire map is a 2D grid of Nodes
 Just an x,y integer along with the ability to retrieve
 
+id allows the map to differentiate between posion tiles and the snake
+hCost and gCost maintain distance from start and target node in path finding
+walkable tells whether the spot is blocked or not
+parent points to the pointer for the Astar once destination is reached
+unit is the size of everynode. The mapheight/unit * mapwidth/unit is the number of nodes
 */
 public class Node {
    public int x,y;
@@ -11,6 +16,7 @@ public class Node {
    public Node parent;
    public int heapIndex;
    public int id;
+   public int unit = 20;
   
    public Node(){
       this.x = 0;
@@ -34,14 +40,6 @@ public class Node {
       this.y += y;
    }
    
-   public int x(){
-      return this.x; 
-   }
-   
-   public int y(){
-      return this.y; 
-   }
-   
   public int fCost(){
     return this.hCost = this.gCost;
   }
@@ -53,15 +51,11 @@ public class Node {
   public void open(){
      this.walkable = true;
   }
-  
-  public boolean isWalkable(){
-    return this.walkable;
-  }
-   
+   //Used for assigning food and posion tiles
    public void random(){
       Random r = new Random();
-      this.x = r.nextInt(width/20);
-      this.y = r.nextInt(height/20);
+      this.x = r.nextInt(width/unit);
+      this.y = r.nextInt(height/unit);
       
    }
    

@@ -36,16 +36,16 @@ public class SnakeAI extends Grid {
       if(panic)
         fill(255, 0, 0);
     stroke(2);
-    
+    int unit = body.get(0).unit;
     for(int i = 0; i < body.size(); i++){
-       rect(body.get(i).x*20, body.get(i).y*20, 20, 20);
+       rect(body.get(i).x*unit, body.get(i).y*unit, unit, unit);
     }
     fill(20, 220, 20); 
-    ellipse(food.x*20+10,food.y*20+10, 20, 20);
+    ellipse(food.x*unit+unit/2,food.y*unit+unit/2, unit, unit);
     fill(255, 0, 0);
     for(int i = 0; i < this.poison.size(); i++){
        //ellipse(poison.get(i).x*20+10, poison.get(i).y*20+10, 20, 20);
-       rect(poison.get(i).x*20, poison.get(i).y*20, 20, 20);
+       rect(poison.get(i).x*unit, poison.get(i).y*unit, unit, unit);
     }
   }
   
@@ -92,7 +92,7 @@ public class SnakeAI extends Grid {
     //System.out.println(endNode.x + ", " +endNode.y);
     grid[endNode.x][endNode.y].open();
     for(int i = this.body.size()-1; i >= 1; i--){
-        this.body.get(i).change(this.body.get(i-1).x(), this.body.get(i-1).y());
+        this.body.get(i).change(this.body.get(i-1).x, this.body.get(i-1).y);
         grid[this.body.get(i).x][this.body.get(i).y].block();
         
     }
@@ -146,12 +146,16 @@ public class SnakeAI extends Grid {
     
   }
   */
-  //If the snake is of certain size, switch to this algorithm
+  //Navigate replaces Astar
+  //Modify the if statment on line 155 to use Astar as much you want
+  //The main difference is this checks each blocked node to see if it is the snake tail
+  //if it is the snake tail, then it will check to see if it has disapeared yet
+  //If tail disapeared then it checks the "blocked" node
   void navigate(){
     double a = body.size() *100;
     double x = a/((double)(columns*rows));
     System.out.println("body size: " + body.size() + "..." + x + "% of total size");
-    if(body.size() < (columns *rows)*.0){//change to 0.7
+    if(body.size() < (columns *rows)*.0001){//change to 0.7
       Astar();
       return;
     }
@@ -187,7 +191,7 @@ public class SnakeAI extends Grid {
         if(neighbor.id == -1){//If poison
           continue;
         }
-        if(!neighbor.isWalkable()){
+        if(!neighbor.walkable){
            int distanceFromTail = this.body.size() - neighbor.id;
            if(currentNode.gCost > distanceFromTail){
                //If this is true, then the snake's tail as already moved out of this position

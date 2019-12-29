@@ -26,8 +26,9 @@ public class Grid {
  //List<Node> snakelist;
  
  public Grid(){
-   this.columns = (int)width/20;
-   this.rows = (int)width/20;
+   Node N = new Node();
+   this.columns = (int)width/N.unit;
+   this.rows = (int)width/N.unit;
    
    grid = new Node[rows][columns];
    for(int i = 0; i < rows; i ++){
@@ -85,10 +86,11 @@ public class Grid {
            if(this.path.contains(N)){
              //fill(20, 220, 20); 
            }//
-           if(!N.isWalkable()){
+           if(!N.walkable){
             //s fill(100, 0, 0);
            }
-           rect(N.x*20, N.y*20, 20, 20);
+           int unit = N.unit;
+           rect(N.x*unit, N.y*unit, unit, unit);
            //grid[i][j].displayText();
         }
      }
@@ -148,7 +150,7 @@ public class Grid {
      List neighbors = getNeighbors(currentNode);
      for(int i = 0; i < neighbors.size(); i++){
         Node neighbor = (Node)neighbors.get(i);
-        if(!neighbor.isWalkable() || closedSet.contains(neighbors.get(i))){
+        if(!neighbor.walkable || closedSet.contains(neighbors.get(i))){
            continue;  
         }
         int newCostToNeighbor = getDistance(currentNode, neighbor) + currentNode.gCost;
